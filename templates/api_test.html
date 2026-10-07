@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Recruitment Photo Maker - API Test
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f3f4f6;
+
+            color: #222;
+        }
+
+
+        .container {
+
+            width: 900px;
+
+            max-width: 95%;
+
+            margin: 30px auto;
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0, 0, 0, 0.12);
+        }
+
+
+        h1 {
+
+            margin-top: 0;
+
+            text-align: center;
+        }
+
+
+        .section {
+
+            margin-top: 20px;
+        }
+
+
+        label {
+
+            display: block;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+
+        input,
+        select {
+
+            width: 100%;
+
+            padding: 11px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            font-size: 15px;
+        }
+
+
+        .custom-box {
+
+            margin-top: 20px;
+
+            padding: 20px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 8px;
+
+            background: #fafafa;
+        }
+
+
+        .grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 15px;
+        }
+
+
+        button {
+
+            width: 100%;
+
+            margin-top: 25px;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        button:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        .preview {
+
+            margin-top: 25px;
+
+            text-align: center;
+        }
+
+
+        .preview img {
+
+            max-width: 250px;
+
+            max-height: 300px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+        }
+
+
+        .result {
+
+            margin-top: 30px;
+
+            padding: 20px;
+
+            border-radius: 8px;
+
+            background: #ecfdf5;
+
+            border: 1px solid #86efac;
+        }
+
+
+        .error {
+
+            background: #fef2f2;
+
+            border: 1px solid #fca5a5;
+
+            color: #991b1b;
+        }
+
+
+        pre {
+
+            background: #111827;
+
+            color: #f9fafb;
+
+            padding: 15px;
+
+            border-radius: 6px;
+
+            overflow-x: auto;
+
+            white-space: pre-wrap;
+        }
+
+
+        .generated {
+
+            text-align: center;
+
+            margin-top: 20px;
+        }
+
+
+        .generated img {
+
+            max-width: 250px;
+
+            max-height: 300px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+        }
+
+
+        .download {
+
+            display: inline-block;
+
+            margin-top: 15px;
+
+            padding: 10px 18px;
+
+            background: #16a34a;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .grid {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        Recruitment Photo Maker
+    </h1>
+
+
+    <p>
+        API Test Interface
+    </p>
+
+
+    <!-- =====================================================
+         Photo
+         ===================================================== -->
+
+    <div class="section">
+
+        <label>
+            Photo
+        </label>
+
+
+        <input
+            type="file"
+            id="photo"
+            accept=".jpg,.jpeg,.png"
+            onchange="showPreview(event)"
+        >
+
+    </div>
+
+
+    <!-- =====================================================
+         Specification
+         ===================================================== -->
+
+    <div class="section">
+
+        <label>
+            Specification
+        </label>
+
+
+        <select
+            id="specification"
+            onchange="updateCustom()"
+        >
+
+            {% for key, spec in specifications.items() %}
+
+                <option value="{{ key }}">
+
+                    {{ spec.name }}
+
+                </option>
+
+            {% endfor %}
+
+
+            <option value="custom">
+
+                Other / Custom
+
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- =====================================================
+         Custom options
+         ===================================================== -->
+
+    <div
+        id="customBox"
+        class="custom-box"
+        style="display:none;"
+    >
+
+        <h3>
+            Custom Specification
+        </h3>
+
+
+        <div class="grid">
+
+
+            <div>
+
+                <label>
+                    Width ratio
+                </label>
+
+                <input
+                    type="number"
+                    id="ratioWidth"
+                    value="3"
+                    min="0.1"
+                    step="0.1"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Height ratio
+                </label>
+
+                <input
+                    type="number"
+                    id="ratioHeight"
+                    value="4"
+                    min="0.1"
+                    step="0.1"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Long side
+                </label>
+
+                <input
+                    type="number"
+                    id="longSide"
+                    value="800"
+                    min="1"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Maximum size (KB)
+                </label>
+
+                <input
+                    type="number"
+                    id="maxKB"
+                    value="100"
+                    min="1"
+                >
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         Submit
+         ===================================================== -->
+
+    <button
+        onclick="sendRequest()"
+    >
+
+        Send API Request
+
+    </button>
+
+
+    <!-- =====================================================
+         Original preview
+         ===================================================== -->
+
+    <div
+        id="preview"
+        class="preview"
+        style="display:none;"
+    >
+
+        <h3>
+            Selected Photo
+        </h3>
+
+
+        <img
+            id="previewImage"
+            alt="Selected photo"
+        >
+
+    </div>
+
+
+    <!-- =====================================================
+         API result
+         ===================================================== -->
+
+    <div
+        id="result"
+        class="result"
+        style="display:none;"
+    >
+
+        <h3>
+            API Response
+        </h3>
+
+
+        <pre id="jsonResult"></pre>
+
+
+        <div
+            id="generated"
+            class="generated"
+        ></div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+    // ========================================================
+    // Custom specification
+    // ========================================================
+
+    function updateCustom() {
+
+        const value =
+            document.getElementById(
+                "specification"
+            ).value;
+
+
+        const box =
+            document.getElementById(
+                "customBox"
+            );
+
+
+        if (value === "custom") {
+
+            box.style.display =
+                "block";
+
+        }
+
+        else {
+
+            box.style.display =
+                "none";
+
+        }
+
+    }
+
+
+    // ========================================================
+    // Image preview
+    // ========================================================
+
+    function showPreview(event) {
+
+        const file =
+            event.target.files[0];
+
+
+        if (!file) {
+
+            return;
+
+        }
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(event) {
+
+                const preview =
+                    document.getElementById(
+                        "preview"
+                    );
+
+
+                const image =
+                    document.getElementById(
+                        "previewImage"
+                    );
+
+
+                image.src =
+                    event.target.result;
+
+
+                preview.style.display =
+                    "block";
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+
+
+    // ========================================================
+    // Send API request
+    // ========================================================
+
+    async function sendRequest() {
+
+
+        const photo =
+            document.getElementById(
+                "photo"
+            ).files[0];
+
+
+        if (!photo) {
+
+            alert(
+                "Please select a photo."
+            );
+
+            return;
+
+        }
+
+
+        const specification =
+            document.getElementById(
+                "specification"
+            ).value;
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "photo",
+            photo
+        );
+
+
+        formData.append(
+            "specification",
+            specification
+        );
+
+
+        // ----------------------------------------------------
+        // Custom values
+        // ----------------------------------------------------
+
+        if (
+            specification ===
+            "custom"
+        ) {
+
+
+            formData.append(
+
+                "ratio_width",
+
+                document.getElementById(
+                    "ratioWidth"
+                ).value
+
+            );
+
+
+            formData.append(
+
+                "ratio_height",
+
+                document.getElementById(
+                    "ratioHeight"
+                ).value
+
+            );
+
+
+            formData.append(
+
+                "long_side",
+
+                document.getElementById(
+                    "longSide"
+                ).value
+
+            );
+
+
+            formData.append(
+
+                "max_kb",
+
+                document.getElementById(
+                    "maxKB"
+                ).value
+
+            );
+
+        }
+
+
+        // ----------------------------------------------------
+        // Show loading state
+        // ----------------------------------------------------
+
+        const resultBox =
+            document.getElementById(
+                "result"
+            );
+
+
+        const jsonResult =
+            document.getElementById(
+                "jsonResult"
+            );
+
+
+        const generated =
+            document.getElementById(
+                "generated"
+            );
+
+
+        resultBox.style.display =
+            "block";
+
+
+        generated.innerHTML =
+            "";
+
+
+        jsonResult.textContent =
+            "Processing...";
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    "/api/create-photo",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            // ------------------------------------------------
+            // Show JSON
+            // ------------------------------------------------
+
+            jsonResult.textContent =
+                JSON.stringify(
+                    data,
+                    null,
+                    4
+                );
+
+
+            // ------------------------------------------------
+            // Generated image
+            // ------------------------------------------------
+
+            if (
+                response.ok
+                &&
+                data.status ===
+                "READY"
+            ) {
+
+
+                generated.innerHTML = `
+
+                    <h3>
+                        Generated Photo
+                    </h3>
+
+                    <img
+                        src="${data.download_url}"
+                        alt="Generated photo"
+                    >
+
+                    <br>
+
+                    <a
+                        class="download"
+                        href="${data.download_url}"
+                        target="_blank"
+                    >
+                        View Photo
+                    </a>
+
+                    <a
+                        class="download"
+                        href="${data.download_url}"
+                        download
+                        style="margin-left:10px;"
+                    >
+                        Download Photo
+                    </a>
+
+                `;
+
+            }
+
+
+        }
+
+        catch (error) {
+
+
+            jsonResult.textContent =
+                JSON.stringify(
+                    {
+                        status:
+                            "ERROR",
+
+                        error:
+                            error.message
+                    },
+
+                    null,
+                    4
+                );
+
+        }
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>

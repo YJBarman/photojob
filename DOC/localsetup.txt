@@ -1,0 +1,335 @@
+Exactly. **For now, your laptop is the server. Later, we can move the same application to a cloud server for 24/7 operation.**
+
+## 📌 Recruitment Photo Maker — Current Setup Summary
+
+### 1. Local application
+
+Your project is located at:
+
+```text
+C:\Users\yjbar\Desktop\Plugin
+```
+
+Main structure:
+
+```text
+Plugin/
+├── app.py                  ← Flask server/API
+├── templates/
+│   ├── index.html          ← Web UI
+│   └── api_test.html       ← API testing UI
+├── src/
+│   ├── photo_maker.py      ← Main photo processing
+│   ├── specifications.py   ← Recruitment specifications
+│   ├── smart_crop.py
+│   ├── face_detector.py
+│   ├── compressor.py
+│   ├── validator.py
+│   └── image_processor.py
+├── input/
+├── output/
+└── .venv/
+```
+
+---
+
+## 2. How the application works
+
+A normal user can use the web interface:
+
+```text
+Browser
+   ↓
+Flask
+   ↓
+Photo Maker Engine
+   ↓
+Generated photo
+```
+
+The API works independently:
+
+```text
+API Client
+   ↓
+POST /api/create-photo
+   ↓
+Flask
+   ↓
+Authentication
+   ↓
+Photo processing
+   ↓
+JSON response + download URL
+```
+
+---
+
+## 3. Current public Internet architecture
+
+Your domain is:
+
+```text
+photojob.me
+```
+
+Your website is currently:
+
+```text
+https://photojob.me
+```
+
+and your API is separated onto:
+
+```text
+https://api.photojob.me
+```
+
+The API route is:
+
+```text
+https://api.photojob.me/api/create-photo
+```
+
+Architecture:
+
+```text
+                 INTERNET
+                    │
+                    ▼
+             api.photojob.me
+                    │
+                    ▼
+              CLOUDFLARE
+                    │
+              Named Tunnel
+                    │
+                    ▼
+             YOUR LAPTOP
+                    │
+             127.0.0.1:5000
+                    │
+                    ▼
+                 Flask
+                    │
+             X-API-Key check
+                    │
+                    ▼
+             Photo Maker Engine
+                    │
+                    ▼
+              Generated JPG
+```
+
+---
+
+## 4. Cloudflare
+
+You created a named tunnel:
+
+```text
+photojob-api
+```
+
+It connects:
+
+```text
+api.photojob.me
+        ↓
+http://127.0.0.1:5000
+```
+
+Cloudflare provides the public HTTPS layer.
+
+So **you don't need to expose port 5000 directly to the Internet.**
+
+---
+
+## 5. Authentication
+
+Your API requires:
+
+```http
+X-API-Key: YOUR_SECRET
+```
+
+The secret is stored as:
+
+```text
+PHOTO_MAKER_API_KEY
+```
+
+rather than being hard-coded into your Python source.
+
+You also saved it as a Windows User environment variable.
+
+So:
+
+```text
+Client
+  ↓
+X-API-Key
+  ↓
+Flask
+  ↓
+Compare with PHOTO_MAKER_API_KEY
+  ↓
+Allowed / rejected
+```
+
+We tested:
+
+```text
+No key       → 401 ❌
+Wrong key    → 401 ❌
+Correct key  → 200/READY ✅
+```
+
+---
+
+## 6. Successful real-world API test
+
+We successfully sent:
+
+```text
+photo.jpg
+```
+
+to:
+
+```text
+https://api.photojob.me/api/create-photo
+```
+
+using the Banking specification.
+
+The API returned:
+
+```text
+Status:          READY
+Resolution:      200 × 230
+File size:       40.01 KB
+Resolution OK:   true
+File size OK:    true
+Download URL:    HTTPS
+```
+
+So the complete public API pipeline is **currently working**. ✅
+
+---
+
+# 🖥️ What is the limitation right now?
+
+Your laptop is acting as the actual compute server:
+
+```text
+Cloudflare
+    ↓
+Your laptop
+    ↓
+Flask
+    ↓
+Photo processing
+```
+
+Therefore:
+
+### Laptop ON + Flask running
+
+```text
+API → WORKING ✅
+```
+
+### Laptop OFF
+
+```text
+API → NOT AVAILABLE ❌
+```
+
+### Flask stopped
+
+```text
+API → NOT AVAILABLE ❌
+```
+
+This is **expected** and perfectly fine during development.
+
+---
+
+# ☁️ Future production architecture
+
+Later we'll move Flask + the photo engine to a cloud server:
+
+```text
+                   INTERNET
+                       │
+                       ▼
+                photojob.me
+                       │
+                  Website
+                       │
+                       │
+                api.photojob.me
+                       │
+                       ▼
+                  Cloudflare
+                       │
+                       ▼
+                CLOUD SERVER
+                       │
+                 ┌─────┴─────┐
+                 │           │
+               Flask      Photo Engine
+                 │
+             Production
+              WSGI server
+```
+
+Then:
+
+```text
+Laptop OFF
+     ↓
+API still works ✅
+```
+
+because the cloud server runs 24/7.
+
+---
+
+## 🚧 What remains
+
+I'd roughly consider the project at this stage:
+
+**Application:** ✅  
+**REST API:** ✅  
+**Authentication:** ✅  
+**HTTPS:** ✅  
+**Custom domain:** ✅  
+**Cloudflare Tunnel:** ✅  
+**Public API:** ✅  
+**Cloud hosting:** ⏳  
+**Production server:** ⏳  
+**Rate limiting/production security:** ⏳  
+**API documentation/schema:** ⏳  
+**ChatGPT integration:** ⏳
+
+### The important thing
+
+**We should not move to cloud hosting yet.**
+
+First we'll finish and test the API locally/publicly. Once the API behavior is stable, moving it from:
+
+```text
+Your laptop
+```
+
+to:
+
+```text
+Cloud server
+```
+
+will mostly be a **deployment change**, not a rewrite of your application.
+
+That is the architecture we're building toward.

@@ -1,0 +1,22 @@
+# Python environments and caches
+.venv/
+.venv-1/
+__pycache__/
+*.py[cod]
+
+# Local uploads and generated results
+input/
+output/
+temp_uploads/
+
+# Local secrets
+api.txt
+.env
+.env.*
+!.env.example
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

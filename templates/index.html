@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Recruitment Photo Maker</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f3f4f6;
+
+            color: #222;
+        }
+
+
+        .container {
+
+            width: 900px;
+
+            max-width: 95%;
+
+            margin: 30px auto;
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0, 0, 0, 0.12);
+        }
+
+
+        h1 {
+
+            text-align: center;
+
+            margin-top: 0;
+
+            margin-bottom: 30px;
+        }
+
+
+        .section {
+
+            margin-bottom: 20px;
+        }
+
+
+        label {
+
+            display: block;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+
+        select,
+        input[type="number"],
+        input[type="file"] {
+
+            width: 100%;
+
+            padding: 10px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            font-size: 15px;
+        }
+
+
+        .custom-box {
+
+            margin-top: 20px;
+
+            padding: 20px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 8px;
+
+            background: #fafafa;
+        }
+
+
+        .custom-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 15px;
+        }
+
+
+        .calculated {
+
+            margin-top: 15px;
+
+            padding: 12px;
+
+            background: #e8f0fe;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+
+            text-align: center;
+        }
+
+
+        .spec-info {
+
+            margin-top: 15px;
+
+            padding: 15px;
+
+            background: #f7f7f7;
+
+            border-radius: 8px;
+
+            white-space: pre-line;
+
+            line-height: 1.5;
+        }
+
+
+        .buttons {
+
+            display: flex;
+
+            gap: 15px;
+
+            margin-top: 20px;
+        }
+
+
+        button {
+
+            flex: 1;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .create-button {
+
+            background: #2563eb;
+
+            color: white;
+        }
+
+
+        .create-button:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        .preview {
+
+            margin-top: 25px;
+
+            text-align: center;
+        }
+
+
+        .preview img {
+
+            max-width: 300px;
+
+            max-height: 300px;
+
+            border-radius: 8px;
+
+            border: 1px solid #ddd;
+        }
+
+
+        .result {
+
+            margin-top: 25px;
+
+            padding: 20px;
+
+            border-radius: 8px;
+
+            background: #ecfdf5;
+
+            border: 1px solid #86efac;
+        }
+
+
+        .error {
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            background: #fef2f2;
+
+            border: 1px solid #fca5a5;
+
+            border-radius: 8px;
+
+            color: #991b1b;
+        }
+
+
+        /* =========================================
+           Generated photo
+           ========================================= */
+
+        .generated-preview {
+
+            text-align: center;
+
+            margin: 20px 0;
+        }
+
+
+        .generated-preview img {
+
+            max-width: 300px;
+
+            max-height: 350px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0, 0, 0, 0.10);
+        }
+
+
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .download {
+            display: inline-block;
+            padding: 11px 20px;
+            background: #16a34a;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .download:hover {
+            background: #15803d;
+        }
+
+
+        /* =========================================
+           Mobile
+           ========================================= */
+
+        @media (max-width: 600px) {
+
+            .container {
+
+                padding: 20px;
+
+                margin: 10px auto;
+            }
+
+
+            .custom-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .result-actions a {
+
+                display: block;
+
+                margin-left: 0 !important;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        Recruitment Photo Maker
+    </h1>
+
+
+    <!-- =========================================
+         Upload
+         ========================================= -->
+
+    <form
+        id="photoForm"
+        enctype="multipart/form-data"
+    >
+
+
+        <div class="section">
+
+            <label>
+                Select Photo
+            </label>
+
+
+            <input
+                type="file"
+                name="photo"
+                accept=".jpg,.jpeg,.png"
+                required
+                onchange="handlePhotoSelection(event)"
+            >
+
+            <div id="uploadStatus" style="display:none; margin-top:15px;">
+                <div id="uploadStatusText">
+                    Uploading photo...
+                </div>
+
+                <div style="
+                    width:100%;
+                    height:12px;
+                    background:#e5e7eb;
+                    border-radius:6px;
+                    overflow:hidden;
+                    margin-top:8px;
+                ">
+                    <div
+                        id="uploadProgressBar"
+                        style="
+                            width:0%;
+                            height:100%;
+                            background:#2563eb;
+                            transition:width 0.15s;
+                        "
+                    ></div>
+                </div>
+
+                <div
+                    id="uploadProgressText"
+                    style="
+                        margin-top:6px;
+                        font-size:14px;
+                        text-align:right;
+                    "
+                >
+                    0%
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             Specification
+             ========================================= -->
+
+        <div class="section">
+
+            <label>
+                Recruitment / Exam
+            </label>
+
+
+            <select
+                name="specification"
+                id="specification"
+                onchange="updateSpecification()"
+            >
+
+                {% for key, spec in specifications.items() %}
+
+                    <option
+                        value="{{ key }}"
+
+                        {% if selected_spec == key %}
+                            selected
+                        {% endif %}
+                    >
+
+                        {{ spec.name }}
+
+                    </option>
+
+                {% endfor %}
+
+
+                <option
+                    value="custom"
+
+                    {% if selected_spec == "custom" %}
+                        selected
+                    {% endif %}
+                >
+
+                    Other / Custom
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- =========================================
+             Specification information
+             ========================================= -->
+
+        <div
+            id="specInfo"
+            class="spec-info"
+        ></div>
+
+
+        <!-- =========================================
+             Custom specification
+             ========================================= -->
+
+        <div
+            id="customBox"
+            class="custom-box"
+            style="display:none;"
+        >
+
+            <h3>
+                Custom Photo Specification
+            </h3>
+
+
+            <div class="custom-grid">
+
+
+                <div>
+
+                    <label>
+                        Width ratio
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="ratioWidth"
+                        name="ratio_width"
+                        value="3"
+                        min="0.1"
+                        step="0.1"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Height ratio
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="ratioHeight"
+                        name="ratio_height"
+                        value="4"
+                        min="0.1"
+                        step="0.1"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Long side
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="longSide"
+                        name="long_side"
+                        value="800"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Maximum file size (KB)
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="maxKB"
+                        name="max_kb"
+                        value="100"
+                        min="1"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <div
+                id="calculated"
+                class="calculated"
+            >
+
+                Calculated:
+                600 × 800 px
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             Create button
+             ========================================= -->
+
+        <input
+            type="hidden"
+            id="uploadId"
+            name="upload_id"
+        >
+
+        <div class="buttons">
+            <button
+                type="submit"
+                class="create-button"
+                id="createButton"
+                disabled
+            >
+                Create Photo
+            </button>
+        </div>
+
+
+    </form>
+
+
+    <!-- =========================================
+         Original photo preview
+         ========================================= -->
+
+    <div
+        id="preview"
+        class="preview"
+        style="display:none;"
+    >
+
+        <h3>
+            Original Photo
+        </h3>
+
+
+        <img
+            id="previewImage"
+            alt="Original photo preview"
+        >
+
+    </div>
+
+
+    <!-- =========================================
+         Error
+         ========================================= -->
+
+    {% if error %}
+
+        <div class="error">
+
+            <strong>
+                Error
+            </strong>
+
+            <br><br>
+
+            {{ error }}
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =========================================
+         Generated result
+         ========================================= -->
+
+    {% if result %}
+
+        <div class="result">
+
+
+            <h3>
+                Generated Photo
+            </h3>
+
+
+            <!-- Generated photo preview -->
+
+            {% if output_filename %}
+
+                <div class="generated-preview">
+
+                    <img
+                        src="/output/{{ output_filename }}"
+                        alt="Generated recruitment photo"
+                    >
+
+                </div>
+
+
+                <!-- View / Download -->
+
+                <div class="result-actions">
+
+
+                    <a
+                        class="download"
+                        href="/output/{{ output_filename }}"
+                        target="_blank"
+                    >
+
+                        View Photo
+
+                    </a>
+
+
+                    <a
+                        class="download"
+                        href="/output/{{ output_filename }}"
+                        download
+                        style="margin-left: 10px;"
+                    >
+
+                        Download Photo
+
+                    </a>
+
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =================================
+                 Validation result
+                 ================================= -->
+
+            <h3 style="margin-top: 30px;">
+
+                Result
+
+            </h3>
+
+
+            <p>
+
+                <strong>
+                    Status:
+                </strong>
+
+                {{ result.status }}
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Resolution:
+                </strong>
+
+                {{ result.resolution.width }}
+
+                ×
+
+                {{ result.resolution.height }}
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    File size:
+                </strong>
+
+                {{ result.file_size_kb }}
+
+                KB
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Resolution OK:
+                </strong>
+
+                {{ result.resolution_ok }}
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    File size OK:
+                </strong>
+
+                {{ result.file_size_ok }}
+
+            </p>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+
+<!-- =====================================================
+     Flask specification data
+     ===================================================== -->
+
+<script
+    id="specifications-data"
+    type="application/json"
+>
+
+    {{ specifications | tojson }}
+
+</script>
+
+
+<script>
+
+
+    /* =====================================================
+       Load specification data
+       ===================================================== */
+
+    const specifications =
+        JSON.parse(
+
+            document.getElementById(
+                "specifications-data"
+            ).textContent
+
+        );
+
+
+    /* =====================================================
+       Update specification information
+       ===================================================== */
+
+    function updateSpecification() {
+
+
+        const select =
+            document.getElementById(
+                "specification"
+            );
+
+
+        const key =
+            select.value;
+
+
+        const info =
+            document.getElementById(
+                "specInfo"
+            );
+
+
+        const customBox =
+            document.getElementById(
+                "customBox"
+            );
+
+
+        /* ================================================
+           Custom mode
+           ================================================ */
+
+        if (key === "custom") {
+
+
+            customBox.style.display =
+                "block";
+
+
+            info.innerText =
+                "Custom photo specification\n"
+                +
+                "Set the aspect ratio, resolution "
+                +
+                "and maximum file size.";
+
+
+            updateCustomDimensions();
+
+
+            return;
+
+        }
+
+
+        /* ================================================
+           Preset mode
+           ================================================ */
+
+        customBox.style.display =
+            "none";
+
+
+        const spec =
+            specifications[key];
+
+
+        if (!spec) {
+
+            info.innerText = "";
+
+            return;
+
+        }
+
+
+        let lines = [];
+
+
+        lines.push(
+            "Specification: "
+            +
+            spec.name
+        );
+
+
+        /* Fixed pixel dimensions */
+
+        if (
+
+            spec.width_px !== null
+
+            &&
+
+            spec.width_px !== undefined
+
+            &&
+
+            spec.height_px !== null
+
+            &&
+
+            spec.height_px !== undefined
+
+        ) {
+
+
+            lines.push(
+
+                "Dimensions: "
+
+                +
+
+                spec.width_px
+
+                +
+
+                " × "
+
+                +
+
+                spec.height_px
+
+                +
+
+                " px"
+
+            );
+
+
+            lines.push(
+
+                "Aspect ratio: "
+
+                +
+
+                spec.width_px
+
+                +
+
+                ":"
+
+                +
+
+                spec.height_px
+
+            );
+
+        }
+
+
+        /* Pixel range */
+
+        if (
+
+            spec.min_width_px !== null
+
+            &&
+
+            spec.min_width_px !== undefined
+
+        ) {
+
+
+            lines.push(
+
+                "Dimensions: "
+
+                +
+
+                spec.min_width_px
+
+                +
+
+                "–"
+
+                +
+
+                spec.max_width_px
+
+                +
+
+                " px"
+
+            );
+
+        }
+
+
+        /* Physical size */
+
+        if (
+
+            spec.physical_size_mm !== null
+
+            &&
+
+            spec.physical_size_mm !== undefined
+
+        ) {
+
+
+            const widthMM =
+                spec.physical_size_mm[0];
+
+
+            const heightMM =
+                spec.physical_size_mm[1];
+
+
+            lines.push(
+
+                "Physical size: "
+
+                +
+
+                widthMM
+
+                +
+
+                " × "
+
+                +
+
+                heightMM
+
+                +
+
+                " mm"
+
+            );
+
+
+            /* Convert physical size to 300 DPI */
+
+            const widthPX =
+                Math.round(
+
+                    widthMM
+                    /
+                    25.4
+                    *
+                    300
+
+                );
+
+
+            const heightPX =
+                Math.round(
+
+                    heightMM
+                    /
+                    25.4
+                    *
+                    300
+
+                );
+
+
+            lines.push(
+
+                "Print resolution: "
+
+                +
+
+                widthPX
+
+                +
+
+                " × "
+
+                +
+
+                heightPX
+
+                +
+
+                " px @ 300 DPI"
+
+            );
+
+        }
+
+
+        /* File size range */
+
+        if (
+
+            spec.min_kb !== null
+
+            &&
+
+            spec.min_kb !== undefined
+
+            &&
+
+            spec.max_kb !== null
+
+            &&
+
+            spec.max_kb !== undefined
+
+        ) {
+
+
+            lines.push(
+
+                "File size: "
+
+                +
+
+                spec.min_kb
+
+                +
+
+                "–"
+
+                +
+
+                spec.max_kb
+
+                +
+
+                " KB"
+
+            );
+
+        }
+
+
+        /* Maximum file size */
+
+        else if (
+
+            spec.max_kb !== null
+
+            &&
+
+            spec.max_kb !== undefined
+
+        ) {
+
+
+            lines.push(
+
+                "Maximum file size: "
+
+                +
+
+                spec.max_kb
+
+                +
+
+                " KB"
+
+            );
+
+        }
+
+
+        /* Format */
+
+        lines.push(
+            "Format: JPEG"
+        );
+
+
+        /* Notes */
+
+        if (spec.notes) {
+
+
+            lines.push(
+
+                "Note: "
+
+                +
+
+                spec.notes
+
+            );
+
+        }
+
+
+        info.innerText =
+            lines.join("\n");
+
+    }
+
+
+    /* =====================================================
+       Custom dimensions
+       ===================================================== */
+
+    function updateCustomDimensions() {
+
+
+        const width =
+            parseFloat(
+
+                document.getElementById(
+                    "ratioWidth"
+                ).value
+
+            );
+
+
+        const height =
+            parseFloat(
+
+                document.getElementById(
+                    "ratioHeight"
+                ).value
+
+            );
+
+
+        const longSide =
+            parseInt(
+
+                document.getElementById(
+                    "longSide"
+                ).value
+
+            );
+
+
+        const calculated =
+            document.getElementById(
+                "calculated"
+            );
+
+
+        /* Invalid values */
+
+        if (
+
+            !width
+
+            ||
+
+            !height
+
+            ||
+
+            !longSide
+
+            ||
+
+            width <= 0
+
+            ||
+
+            height <= 0
+
+            ||
+
+            longSide <= 0
+
+        ) {
+
+
+            calculated.innerText =
+                "Calculated: invalid values";
+
+
+            return;
+
+        }
+
+
+        let outputWidth;
+
+        let outputHeight;
+
+
+        /* Landscape / square */
+
+        if (width >= height) {
+
+
+            outputWidth =
+                longSide;
+
+
+            outputHeight =
+                Math.round(
+
+                    longSide
+                    *
+                    height
+                    /
+                    width
+
+                );
+
+        }
+
+
+        /* Portrait */
+
+        else {
+
+
+            outputHeight =
+                longSide;
+
+
+            outputWidth =
+                Math.round(
+
+                    longSide
+                    *
+                    width
+                    /
+                    height
+
+                );
+
+        }
+
+
+        calculated.innerText =
+
+            "Calculated: "
+
+            +
+
+            outputWidth
+
+            +
+
+            " × "
+
+            +
+
+            outputHeight
+
+            +
+
+            " px";
+
+    }
+
+
+    /* =====================================================
+       Original image preview
+       ===================================================== */
+
+    function previewImage(event) {
+
+
+        const file =
+            event.target.files[0];
+
+
+        if (!file) {
+
+            return;
+
+        }
+
+
+        const preview =
+            document.getElementById(
+                "preview"
+            );
+
+
+        const image =
+            document.getElementById(
+                "previewImage"
+            );
+
+
+        /* Check image type */
+
+        if (
+
+            !file.type.startsWith(
+                "image/"
+            )
+
+        ) {
+
+
+            alert(
+                "Please select an image file."
+            );
+
+
+            return;
+
+        }
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(event) {
+
+
+                image.src =
+                    event.target.result;
+
+
+                preview.style.display =
+                    "block";
+
+            };
+
+
+        reader.readAsDataURL(
+            file
+        );
+
+    }
+
+
+    /* =====================================================
+       Custom input listeners
+       ===================================================== */
+
+    document
+        .getElementById("ratioWidth")
+        .addEventListener(
+            "input",
+            updateCustomDimensions
+        );
+
+
+    document
+        .getElementById("ratioHeight")
+        .addEventListener(
+            "input",
+            updateCustomDimensions
+        );
+
+
+    document
+        .getElementById("longSide")
+        .addEventListener(
+            "input",
+            updateCustomDimensions
+        );
+
+
+    // =====================================================
+    // Photo upload with progress
+    // =====================================================
+
+    function handlePhotoSelection(event) {
+
+        const file = event.target.files[0];
+
+        const uploadStatus =
+            document.getElementById("uploadStatus");
+
+        const uploadStatusText =
+            document.getElementById("uploadStatusText");
+
+        const progressBar =
+            document.getElementById("uploadProgressBar");
+
+        const progressText =
+            document.getElementById("uploadProgressText");
+
+        const uploadIdInput =
+            document.getElementById("uploadId");
+
+        const createButton =
+            document.getElementById("createButton");
+
+        // Reset previous upload
+        uploadIdInput.value = "";
+        createButton.disabled = true;
+
+        if (!file) {
+            uploadStatus.style.display = "none";
+            return;
+        }
+
+        // Check file type
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+
+            alert(
+                "Please select a JPG, JPEG or PNG image."
+            );
+
+            event.target.value = "";
+            uploadStatus.style.display = "none";
+
+            return;
+        }
+
+        // Show original preview
+        previewImage(event);
+
+        // Show upload UI
+        uploadStatus.style.display = "block";
+
+        uploadStatusText.innerText =
+            "Uploading photo...";
+
+        progressBar.style.width = "0%";
+        progressText.innerText = "0%";
+
+        // Create multipart upload
+        const formData = new FormData();
+
+        formData.append(
+            "photo",
+            file
+        );
+
+        // XMLHttpRequest allows upload progress tracking
+        const xhr = new XMLHttpRequest();
+
+        xhr.open(
+            "POST",
+            "/browser/upload",
+            true
+        );
+
+       
+
+        // Upload progress
+        xhr.upload.addEventListener(
+            "progress",
+            function(event) {
+
+                if (!event.lengthComputable) {
+                    return;
+                }
+
+                const percent =
+                    Math.round(
+                        (event.loaded / event.total) * 100
+                    );
+
+                progressBar.style.width =
+                    percent + "%";
+
+                progressText.innerText =
+                    percent + "%";
+            }
+        );
+
+        // Upload completed
+        xhr.addEventListener(
+            "load",
+            function() {
+
+                if (xhr.status !== 200) {
+
+                    uploadStatusText.innerText =
+                        "Upload failed.";
+
+                    progressBar.style.width = "0%";
+
+                    progressText.innerText = "";
+
+                    try {
+                        const response =
+                            JSON.parse(xhr.responseText);
+
+                        alert(
+                            response.error ||
+                            "Upload failed."
+                        );
+
+                    } catch {
+                        alert(
+                            "Upload failed."
+                        );
+                    }
+
+                    return;
+                }
+
+                try {
+
+                    const response =
+                        JSON.parse(
+                            xhr.responseText
+                        );
+
+                    if (
+                        response.status !==
+                        "UPLOADED"
+                    ) {
+                        throw new Error(
+                            response.error ||
+                            "Upload failed."
+                        );
+                    }
+
+                    // Store upload ID
+                    uploadIdInput.value =
+                        response.upload_id;
+
+                    // Upload complete
+                    progressBar.style.width =
+                        "100%";
+
+                    progressText.innerText =
+                        "100%";
+
+                    uploadStatusText.innerText =
+                        "✓ Photo uploaded successfully";
+
+                    // Enable Create Photo
+                    createButton.disabled =
+                        false;
+
+                } catch (error) {
+
+                    uploadStatusText.innerText =
+                        "Upload failed.";
+
+                    alert(
+                        error.message ||
+                        "Upload failed."
+                    );
+                }
+            }
+        );
+
+        // Network error
+        xhr.addEventListener(
+            "error",
+            function() {
+
+                uploadStatusText.innerText =
+                    "Upload failed.";
+
+                progressBar.style.width =
+                    "0%";
+
+                progressText.innerText =
+                    "";
+
+                alert(
+                    "Network error while uploading photo."
+                );
+            }
+        );
+
+        // Start upload
+        xhr.send(formData);
+    }
+
+    // =====================================================
+    // Create photo using uploaded file
+    // =====================================================
+
+    document
+        .getElementById("photoForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const createButton =
+                document.getElementById("createButton");
+
+            const uploadId =
+                document.getElementById("uploadId").value;
+
+            const specification =
+                document.getElementById("specification").value;
+
+            if (!uploadId) {
+                alert("Please upload a photo first.");
+                return;
+            }
+
+            createButton.disabled = true;
+            createButton.innerText = "Creating Photo...";
+
+            try {
+
+                const formData = new FormData();
+
+                formData.append(
+                    "upload_id",
+                    uploadId
+                );
+
+                formData.append(
+                    "specification",
+                    specification
+                );
+
+                // Custom specification fields
+                if (specification === "custom") {
+
+                    formData.append(
+                        "ratio_width",
+                        document.getElementById("ratioWidth").value
+                    );
+
+                    formData.append(
+                        "ratio_height",
+                        document.getElementById("ratioHeight").value
+                    );
+
+                    formData.append(
+                        "long_side",
+                        document.getElementById("longSide").value
+                    );
+
+                    formData.append(
+                        "max_kb",
+                        document.getElementById("maxKB").value
+                    );
+                }
+
+                const response = await fetch(
+                    "/browser/create-photo",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok || result.status !== "READY") {
+                    throw new Error(
+                        result.error ||
+                        "Photo creation failed."
+                    );
+                }
+
+                // Display generated result
+                showGeneratedResult(result);
+
+            } catch (error) {
+
+                alert(
+                    error.message ||
+                    "Could not create photo."
+                );
+
+            } finally {
+
+                createButton.disabled = false;
+                createButton.innerText = "Create Photo";
+            }
+        });
+
+
+    // =====================================================
+    // Display generated photo
+    // =====================================================
+
+    function showGeneratedResult(result) {
+
+        const resultBox =
+            document.createElement("div");
+
+        resultBox.className = "result";
+
+        resultBox.innerHTML = `
+            <h3>Generated Photo</h3>
+
+            <div class="generated-preview">
+                <img
+                    src="${result.download_url}"
+                    alt="Generated recruitment photo"
+                >
+            </div>
+
+            <div class="result-actions">
+
+                <a
+                    class="download"
+                    href="${result.download_url}"
+                    target="_blank"
+                >
+                    View Photo
+                </a>
+
+                <a
+                    class="download"
+                    href="${result.download_url}"
+                    download
+                    style="margin-left: 10px;"
+                >
+                    Download Photo
+                </a>
+
+            </div>
+
+            <h3 style="margin-top: 30px;">
+                Result
+            </h3>
+
+            <p>
+                <strong>Status:</strong>
+                ${result.status}
+            </p>
+
+            <p>
+                <strong>Resolution:</strong>
+                ${result.resolution.width}
+                ×
+                ${result.resolution.height}
+            </p>
+
+            <p>
+                <strong>File size:</strong>
+                ${result.file_size_kb} KB
+            </p>
+
+            <p>
+                <strong>Resolution OK:</strong>
+                ${result.resolution_ok}
+            </p>
+
+            <p>
+                <strong>File size OK:</strong>
+                ${result.file_size_ok}
+            </p>
+        `;
+
+        const existingResult =
+            document.querySelector(".result");
+
+        if (existingResult) {
+            existingResult.remove();
+        }
+
+        document
+            .querySelector(".container")
+            .appendChild(resultBox);
+
+        resultBox.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+
+
+    /* =====================================================
+       Initial page state
+       ===================================================== */
+
+    updateSpecification();
+
+
+</script>
+
+
+</body>
+
+</html>
