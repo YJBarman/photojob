@@ -3,9 +3,8 @@ from pathlib import Path
 
 def validate_photo(path, spec):
 
-    image = Image.open(path)
-
-    width, height = image.size
+    with Image.open(path) as image:
+        width, height = image.size
 
     result = {
         "resolution": {

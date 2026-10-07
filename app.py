@@ -10,8 +10,6 @@ from flask import (
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pathlib import Path
 import tempfile
-import webbrowser
-import threading
 import uuid
 import os
 import logging
@@ -1549,11 +1547,6 @@ def open_browser():
 # ============================================================
 
 if __name__ == "__main__":
-
-    threading.Timer(
-        1.0,
-        open_browser
-    ).start()
 
     app.run(
         host="127.0.0.1",
